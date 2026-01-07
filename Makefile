@@ -2,6 +2,7 @@ PN = kodi-standalone-service
 
 PREFIX ?= /usr
 INITDIR = $(PREFIX)/lib/systemd/system
+INITDIR_UBUNTU = $(PREFIX)/lib/systemd/system
 USERDIR = $(PREFIX)/lib/sysusers.d
 TMPFDIR = $(PREFIX)/lib/tmpfiles.d
 UDEVDIR = $(PREFIX)/lib/udev/rules.d
@@ -15,6 +16,9 @@ INSTALL_DIR = $(INSTALL) -d
 INSTALL_PROGRAM = $(INSTALL) -m755
 INSTALL_DATA = $(INSTALL) -m644
 
+CP := ) # Workaround for the inability of make to escape the closing parenthesis character
+IS_OS_UBUNTU_2X.XX := $(shell test -r /etc/os-release && . /etc/os-release; test "$${NAME}" = Ubuntu && case "$${VERSION_ID}" in 2*$(CP) echo yes;; *$(CP) echo no;; esac)
+
 IS_ARCH_ARM := $(shell uname -m | grep -q -E "^(arm|aarch64)"; echo $$?)
 ifeq ($(IS_ARCH_ARM), 0)
 	ARCH = arm
@@ -27,6 +31,8 @@ common/$(PN):
 	@echo -e '\033[1;32mJust run make install as root.\033[0m'
 
 install-common:
+	@echo We are on $(ARCH)
+	@echo We are on Ubuntu 2X.XX - $(IS_OS_UBUNTU_2X.XX)
 	$(INSTALL_DIR) "$(DESTDIR)$(UDEVDIR)"
 	$(INSTALL_DIR) "$(DESTDIR)$(ENVDIR)"
 	$(INSTALL_DATA) $(ARCH)/udev/99-kodi.rules "$(DESTDIR)$(UDEVDIR)/99-kodi.rules"
@@ -40,6 +46,11 @@ install-init:
 	$(INSTALL_DIR) "$(DESTDIR)$(INITDIR)"
 	$(INSTALL_DIR) "$(DESTDIR)$(USERDIR)"
 	$(INSTALL_DIR) "$(DESTDIR)$(TMPFDIR)"
+	$(INSTALL_DATA) $(ARCH)/init/tmpfiles.conf "$(DESTDIR)$(TMPFDIR)/kodi-standalone.conf"
+ifeq ($(IS_OS_UBUNTU_2X.XX),yes)
+	$(INSTALL_DATA) $(ARCH)/init/sysusers-ubuntu.conf "$(DESTDIR)$(USERDIR)/kodi-standalone.conf"
+	$(INSTALL_DATA) $(ARCH)/init/kodi-ubuntu.service "$(DESTDIR)$(INITDIR_UBUNTU)/kodi.service"
+else
 ifeq ($(ARCH),x86)
 	$(INSTALL_DATA) $(ARCH)/init/kodi-gbm.service "$(DESTDIR)$(INITDIR)/kodi-gbm.service"
 	$(INSTALL_DATA) $(ARCH)/init/kodi-wayland.service "$(DESTDIR)$(INITDIR)/kodi-wayland.service"
@@ -50,14 +61,18 @@ ifeq ($(ARCH),x86)
 else
 	$(INSTALL_DATA) $(ARCH)/init/kodi.service "$(DESTDIR)$(INITDIR)/kodi.service"
 endif
-	$(INSTALL_DATA) $(ARCH)/init/tmpfiles.conf "$(DESTDIR)$(TMPFDIR)/kodi-standalone.conf"
 	$(INSTALL_DATA) $(ARCH)/init/sysusers.conf "$(DESTDIR)$(USERDIR)/kodi-standalone.conf"
+endif
 
 install-man:
 	$(INSTALL_DIR) "$(DESTDIR)$(MANDIR)"
 	$(INSTALL_DATA) $(ARCH)/doc/kodi.service.1 "$(DESTDIR)$(MANDIR)/kodi.service.1"
 
 uninstall:
+ifeq ($(IS_OS_UBUNTU_2X.XX))
+	$(RM) "$(DESTDIR)$(INITDIR_UBUNTU)/kodi.service"
+	$(RM) "$(DESTDIR)$(POLKDIR)/99-kodi.rules"
+else
 ifeq ($(ARCH),x86)
 	$(RM) "$(DESTDIR)$(INITDIR)/kodi-gbm.service"
 	$(RM) "$(DESTDIR)$(INITDIR)/kodi-wayland.service"
@@ -65,6 +80,7 @@ ifeq ($(ARCH),x86)
 else
 	$(RM) "$(DESTDIR)$(INITDIR)/kodi.service"
 	$(RM) "$(DESTDIR)$(POLKDIR)/99-kodi.rules"
+endif
 endif
 	$(RM) "$(DESTDIR)$(TMPFDIR)/kodi-standalone.conf"
 	$(RM) "$(DESTDIR)$(USERDIR)/kodi-standalone.conf"

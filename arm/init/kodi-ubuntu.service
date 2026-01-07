@@ -1,0 +1,21 @@
+[Unit]
+Description=Kodi standalone
+After=remote-fs.target systemd-user-sessions.service network-online.target nss-lookup.target sound.target bluetooth.target polkit.service upower.service mysqld.service lircd.service
+Wants=network-online.target polkit.service upower.service
+Conflicts=getty@tty1.service
+
+[Service]
+User=kodi
+Group=kodi
+EnvironmentFile=-/etc/conf.d/kodi-standalone
+PAMName=login
+TTYPath=/dev/tty1
+ExecStart=/usr/bin/kodi --standalone --windowing=gbm --audio-backend=pipewire
+Restart=on-failure
+StandardInput=tty
+StandardOutput=journal
+SuccessExitStatus=143
+
+[Install]
+#Alias=display-manager.service
+WantedBy = multi-user.target
