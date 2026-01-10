@@ -10,7 +10,16 @@ Group=kodi
 EnvironmentFile=-/etc/conf.d/kodi-standalone
 PAMName=login
 TTYPath=/dev/tty1
-ExecStart=/usr/bin/kodi --standalone --windowing=gbm --audio-backend=pipewire
+# Select audio backends
+#     pipewire - Has distorted sound with Kodi 21.2 on Ubuntu 24.04.3 LTS
+#     pulseaudio - Works with Kodi 21.2 on Ubuntu 24.04.3 LTS through pipewire-pulse
+#     alsa - Works, but conflicts when librespotify needs to run in parallel
+#     alsa+pulseaudio - same as the two previous ones combined, should also allow passthrough if needed
+
+#ExecStart=/usr/bin/kodi --standalone --windowing=gbm --audio-backend=pipewire
+ExecStart=/usr/bin/kodi --standalone --windowing=gbm --audio-backend=pulseaudio
+#ExecStart=/usr/bin/kodi --standalone --windowing=gbm --audio-backend=alsa
+#ExecStart=/usr/bin/kodi --standalone --windowing=gbm --audio-backend=alsa+pulseaudio
 Restart=on-failure
 StandardInput=tty
 StandardOutput=journal

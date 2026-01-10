@@ -1,0 +1,19 @@
+[Unit]
+Description=Librespot (an open source Spotify client)
+Documentation=https://github.com/librespot-org/librespot
+Documentation=https://github.com/librespot-org/librespot/wiki/Options
+Wants=network.target sound.target
+After=network.target sound.target
+
+[Service]
+User=kodi
+Group=kodi
+EnvironmentFile=-/etc/conf.d/kodi-standalone
+PAMName=login
+TTYPath=/dev/tty1
+Restart=always
+RestartSec=10
+ExecStart=/usr/bin/librespot --backend pulseaudio --name KodiPi4 --bitrate 320 --format F32 --initial-volume 100 --volume-ctrl linear
+
+[Install]
+WantedBy=multi-user.target

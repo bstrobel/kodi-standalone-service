@@ -3,8 +3,8 @@
 
 MYDIR=$(dirname $0)
 INITDIR=/etc/systemd/system
-UDEVDIR=/usr/lib/udev/rules.d
-POLKDIR=/usr/share/polkit-1/rules.d
+UDEVDIR=/etc/udev/rules.d
+POLKDIR=/etc/polkit-1/rules.d
 KODI_USERNAME=kodi
 KODI_USERHOME=/var/lib/kodi
 
@@ -72,6 +72,7 @@ function kodiuser {
 			else
 				printf 'User %s does not exist. Doing nothing!\n' $KODI_USERNAME
 			fi
+			sleep 10 # to wait for shutdown of all processes of user $KODI_USERNAME
 			if $(id -g $KODI_USERNAME >/dev/null 2>/dev/null); then
 				$ECHO sudo groupdel \
 					--force \
