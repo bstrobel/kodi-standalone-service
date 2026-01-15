@@ -1,0 +1,12 @@
+<keymap>
+	<global>
+		<keyboard>
+			<!-- 
+				Created with Keymap Editor Addon
+				Powers off the system when physical powerbutton is pressed
+				instead of showing the Shutdown Menu of Kodi.
+			-->
+			<key id="61662">shutdown</key>
+		</keyboard>
+	</global>
+</keymap>

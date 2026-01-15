@@ -1,0 +1,31 @@
+<advancedsettings version="1.0">
+	<!--
+		https://kodi.wiki/view/Advancedsettings.xml
+
+		.kodi/userdata/advancedsettings.xml
+	-->
+
+	<!--
+		loglevel
+		https://kodi.wiki/view/Advancedsettings.xml#loglevel
+
+		Option	Action
+		-1	No logging, suppresses all log output
+		0	Normal logging, only logging errors (default)
+		1	Debug logging with freemem, fps and cpu usage (no on screen)
+		2	Same as 1 (with on screen display)
+		3	Same as 1 + full smb logging
+	-->
+	<loglevel>1</loglevel>
+
+	<!--
+		remotedelay
+
+		https://kodi.wiki/view/Advancedsettings.xml#remotedelay
+		The repeat delay for a LIRC remote control. A delay value between 1 and 20 before a remote button starts repeating on a long keypress (i.e. continuously sending button pushes while it's held down).
+
+		Default: 3
+	-->
+	<remotedelay>10</remotedelay>
+
+</advancedsettings>
